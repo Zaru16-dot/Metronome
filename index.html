@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Metronome</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0f0f0f;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .app {
+      width: 90%;
+      max-width: 380px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 24px;
+      opacity: 0.8;
+    }
+
+    .bpm {
+      font-size: 72px;
+      font-weight: bold;
+      margin: 20px 0 5px;
+    }
+
+    .label {
+      opacity: 0.6;
+      margin-bottom: 20px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      margin: 20px 0;
+    }
+
+    button {
+      width: 100%;
+      padding: 18px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      background: white;
+      color: black;
+    }
+
+    .secondary {
+      background: #242424;
+      color: white;
+    }
+
+    .beats {
+      font-size: 32px;
+      letter-spacing: 8px;
+      margin: 25px 0;
+    }
+
+    select {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      background: #1c1c1c;
+      color: white;
+      border: 1px solid #333;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>METRONOME</h1>
+
+    <div class="bpm" id="bpmDisplay">130</div>
+    <div class="label">BPM</div>
+
+    <input id="bpmSlider" type="range" min="40" max="240" value="130" />
+
+    <select id="timeSignature">
+      <option value="4">4/4</option>
+      <option value="3">3/4</option>
+      <option value="6">6/8</option>
+    </select>
+
+    <div class="beats" id="beatDots">● ○ ○ ○</div>
+
+    <button id="startStop">START</button>
+    <button class="secondary" id="tapTempo">TAP TEMPO</button>
+  </div>
+
+  <script>
+    let bpm = 130;
+    let isPlaying = false;
+    let beat = 0;
+    let beatsPerBar = 4;
+    let interval = null;
+    let taps = [];
+
+    const bpmDisplay = document.getElementById("bpmDisplay");
+    const bpmSlider = document.getElementById("bpmSlider");
+    const startStop = document.getElementById("startStop");
+    const tapTempo = document.getElementById("tapTempo");
+    const beatDots = document.getElementById("beatDots");
+    const timeSignature = document.getElementById("timeSignature");
+
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playClick(accent = false) {
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+
+      osc.frequency.value = accent ? 1200 : 800;
+      gain.gain.value = accent ? 0.8 : 0.45;
+
+      osc.connect(gain);
+      gain.connect(audioContext.destination);
+
+      osc.start();
+      osc.stop(audioContext.currentTime + 0.05);
+    }
+
+    function updateDots() {
+      let dots = "";
+      for (let i = 0; i < beatsPerBar; i++) {
+        dots += i === beat ? "● " : "○ ";
+      }
+      beatDots.textContent = dots.trim();
+    }
+
+    function tick() {
+      playClick(beat === 0);
+      updateDots();
+      beat = (beat + 1) % beatsPerBar;
+    }
+
+    function startMetronome() {
+      audioContext.resume();
+      beat = 0;
+      tick();
+      interval = setInterval(tick, 60000 / bpm);
+      isPlaying = true;
+      startStop.textContent = "STOP";
+    }
+
+    function stopMetronome() {
+      clearInterval(interval);
+      isPlaying = false;
+      startStop.textContent = "START";
+    }
+
+    function restartIfPlaying() {
+      if (isPlaying) {
+        stopMetronome();
+        startMetronome();
+      }
+    }
+
+    bpmSlider.addEventListener("input", () => {
+      bpm = Number(bpmSlider.value);
+      bpmDisplay.textContent = bpm;
+      restartIfPlaying();
+    });
+
+    timeSignature.addEventListener("change", () => {
+      beatsPerBar = Number(timeSignature.value);
+      beat = 0;
+      updateDots();
+      restartIfPlaying();
+    });
+
+    startStop.addEventListener("click", () => {
+      if (isPlaying) {
+        stopMetronome();
+      } else {
+        startMetronome();
+      }
+    });
+
+    tapTempo.addEventListener("click", () => {
+      const now = Date.now();
+      taps.push(now);
+
+      if (taps.length > 4) taps.shift();
+
+      if (taps.length >= 2) {
+        const intervals = [];
+        for (let i = 1; i < taps.length; i++) {
+          intervals.push(taps[i] - taps[i - 1]);
+        }
+
+        const avg = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+        bpm = Math.round(60000 / avg);
+
+        if (bpm >= 40 && bpm <= 240) {
+          bpmDisplay.textContent = bpm;
+          bpmSlider.value = bpm;
+          restartIfPlaying();
+        }
+      }
+    });
+
+    updateDots();
+  </script>
+</body>
+</html>
