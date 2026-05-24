@@ -10,8 +10,11 @@
       --bg: #050505;
       --text: #f3f3f3;
       --muted: #777;
-      --accent: #f1ea00;
+      --accent: #ff2400;
+      --contrast-accent: #00c8ff;
       --line: var(--accent);
+      --slider-fill: 45%;
+      --slider-rest: #666666;
     }
 
     * {
@@ -62,16 +65,17 @@
       font-size: 9px;
       line-height: 1.2;
       text-transform: uppercase;
-      color: var(--muted);
+      color: var(--accent);
       max-width: 145px;
       text-align: right;
+      opacity: 0.8;
     }
 
     .settings-btn {
       margin-top: 14px;
       background: none;
       border: 2px solid var(--line);
-      color: var(--text);
+      color: var(--accent);
       padding: 10px 12px;
       font-size: 11px;
       font-weight: 900;
@@ -87,9 +91,10 @@
       font-size: 11px;
       letter-spacing: 8px;
       font-weight: 900;
-      color: var(--muted);
+      color: var(--accent);
       text-transform: uppercase;
       margin-bottom: 12px;
+      opacity: 0.75;
     }
 
     .bpm {
@@ -108,13 +113,64 @@
       font-size: 18px;
       letter-spacing: 16px;
       font-weight: 900;
-      color: var(--muted);
+      color: var(--accent);
+      opacity: 0.7;
     }
 
+    /* SLIDER */
     input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
       width: 100%;
       margin: 30px 0 22px;
-      accent-color: var(--accent);
+      height: 14px;
+      border: 0;
+      outline: none;
+      border-radius: 999px;
+      background: linear-gradient(
+        to right,
+        var(--accent) 0%,
+        var(--accent) var(--slider-fill),
+        var(--slider-rest) var(--slider-fill),
+        var(--slider-rest) 100%
+      );
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 14px;
+      background: transparent;
+      border: none;
+      border-radius: 999px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      margin-top: -7px;
+      border-radius: 50%;
+      background: var(--contrast-accent);
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    input[type="range"]::-moz-range-track {
+      height: 14px;
+      background: transparent;
+      border: none;
+      border-radius: 999px;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--contrast-accent);
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 0 2px var(--accent);
     }
 
     .grid {
@@ -128,7 +184,7 @@
       border-radius: 0;
       border: 2px solid var(--line);
       background: var(--bg);
-      color: var(--text);
+      color: var(--accent);
       padding: 16px;
       font-size: 13px;
       font-weight: 900;
@@ -183,6 +239,7 @@
       margin-top: 12px;
       width: 100%;
       background: transparent;
+      color: var(--accent);
     }
 
     .footer {
@@ -190,11 +247,12 @@
       padding-top: 12px;
       font-size: 9px;
       line-height: 1.3;
-      color: var(--muted);
+      color: var(--accent);
       text-transform: uppercase;
       display: flex;
       justify-content: space-between;
       gap: 20px;
+      opacity: 0.65;
     }
 
     .settings-panel {
@@ -248,9 +306,10 @@
       font-size: 12px;
       font-weight: 900;
       letter-spacing: 4px;
-      color: var(--muted);
+      color: var(--accent);
       text-transform: uppercase;
       margin-bottom: 12px;
+      opacity: 0.8;
     }
 
     .colors {
@@ -265,22 +324,23 @@
     }
 
     .color-btn.selected {
-      outline: 3px solid var(--accent);
+      outline: 3px solid var(--contrast-accent);
       outline-offset: 3px;
     }
 
     .yellow { background: #f1ea00; }
-    .white { background: #ffffff; }
-    .red { background: #ff2400; }
-    .green { background: #00ff22; }
-    .blue { background: #2f66ff; }
+    .white  { background: #ffffff; }
+    .red    { background: #ff2400; }
+    .green  { background: #00ff22; }
+    .blue   { background: #2f66ff; }
     .purple { background: #b000ff; }
 
     .info-text {
       font-size: 10px;
       line-height: 1.5;
-      color: var(--muted);
+      color: var(--accent);
       text-transform: uppercase;
+      opacity: 0.65;
     }
   </style>
 </head>
@@ -331,13 +391,13 @@
         <div class="beats" id="beatDots"></div>
 
         <button class="start" id="startStop">START</button>
-        <button class="tap" id="tapTempo">TAP TEMPO</button>
+        <button class="tap" id="tapTempo">Tap Tempo</button>
       </div>
     </div>
 
     <div class="footer">
-      <div>system status: <span id="status">stopped</span></div>
-      <div>v.03 / local rhythm machine</div>
+      <div>System status: <span id="status">stopped</span></div>
+      <div>v.04 / local rhythm machine</div>
     </div>
   </div>
 
@@ -351,9 +411,9 @@
       <div class="setting-name">Accent color</div>
 
       <div class="colors">
-        <button class="color-btn yellow selected" data-color="#f1ea00"></button>
+        <button class="color-btn yellow" data-color="#f1ea00"></button>
         <button class="color-btn white" data-color="#ffffff"></button>
-        <button class="color-btn red" data-color="#ff2400"></button>
+        <button class="color-btn red selected" data-color="#ff2400"></button>
         <button class="color-btn green" data-color="#00ff22"></button>
         <button class="color-btn blue" data-color="#2f66ff"></button>
         <button class="color-btn purple" data-color="#b000ff"></button>
@@ -364,7 +424,7 @@
       <div class="setting-name">Design note</div>
       <div class="info-text">
         brutalist inspired rhythm interface. hard grid, long type, harsh contrast,
-        minimal controls, hidden options. made to stay usable while practicing.
+        minimal controls, hidden options. slider thumb uses complementary color.
       </div>
     </div>
   </div>
@@ -398,6 +458,33 @@
     const colorButtons = document.querySelectorAll(".color-btn");
 
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    const complementaryMap = {
+      "#f1ea00": "#2f66ff",
+      "#ffffff": "#ff2400",
+      "#ff2400": "#00c8ff",
+      "#00ff22": "#ff00c8",
+      "#2f66ff": "#ffd400",
+      "#b000ff": "#a8ff00"
+    };
+
+    function updateSliderProgress() {
+      const min = Number(bpmSlider.min);
+      const max = Number(bpmSlider.max);
+      const value = Number(bpmSlider.value);
+      const percent = ((value - min) / (max - min)) * 100;
+      document.documentElement.style.setProperty("--slider-fill", percent + "%");
+    }
+
+    function updateTheme(color) {
+      const normalized = color.toLowerCase();
+      const complementary = complementaryMap[normalized] || "#ffffff";
+
+      document.documentElement.style.setProperty("--accent", normalized);
+      document.documentElement.style.setProperty("--line", normalized);
+      document.documentElement.style.setProperty("--contrast-accent", complementary);
+      updateSliderProgress();
+    }
 
     function playClick(accent = false) {
       const osc = audioContext.createOscillator();
@@ -482,6 +569,7 @@
       bpm = Math.max(40, Math.min(240, newBpm));
       bpmDisplay.textContent = bpm;
       bpmSlider.value = bpm;
+      updateSliderProgress();
       restartIfPlaying();
     }
 
@@ -550,13 +638,15 @@
     colorButtons.forEach(button => {
       button.addEventListener("click", () => {
         const color = button.dataset.color;
-        document.documentElement.style.setProperty("--accent", color);
+        updateTheme(color);
 
         colorButtons.forEach(btn => btn.classList.remove("selected"));
         button.classList.add("selected");
       });
     });
 
+    updateTheme("#ff2400");
+    updateSliderProgress();
     renderBeats();
   </script>
 </body>
