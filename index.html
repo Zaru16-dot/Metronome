@@ -4,99 +4,253 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Metronome</title>
+
   <style>
+    :root {
+      --bg: #050505;
+      --text: #f2f2f2;
+      --muted: #8f8f8f;
+      --panel: #101010;
+      --border: #f2f2f2;
+      --accent: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      background: #0f0f0f;
-      color: white;
-      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      padding: 18px;
     }
 
     .app {
-      width: 90%;
-      max-width: 380px;
-      text-align: center;
+      width: 100%;
+      max-width: 430px;
+      border: 3px solid var(--border);
+      padding: 18px;
+      background: var(--panel);
+      box-shadow: 8px 8px 0 var(--accent);
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 18px;
     }
 
     h1 {
+      margin: 0;
       font-size: 24px;
-      opacity: 0.8;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .status {
+      border: 2px solid var(--border);
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--bg);
+      background: var(--accent);
+    }
+
+    .bpm-box {
+      border: 3px solid var(--border);
+      padding: 24px 12px;
+      text-align: center;
+      margin-bottom: 16px;
+      background: var(--bg);
     }
 
     .bpm {
-      font-size: 72px;
-      font-weight: bold;
-      margin: 20px 0 5px;
+      font-size: 92px;
+      font-weight: 900;
+      line-height: 0.95;
+      color: var(--accent);
     }
 
     .label {
-      opacity: 0.6;
-      margin-bottom: 20px;
+      margin-top: 8px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: var(--muted);
     }
 
     input[type="range"] {
       width: 100%;
-      margin: 20px 0;
+      accent-color: var(--accent);
+      margin: 18px 0;
+    }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    select,
+    button {
+      width: 100%;
+      border: 3px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 900;
+      text-transform: uppercase;
+      border-radius: 0;
+      appearance: none;
     }
 
     button {
-      width: 100%;
-      padding: 18px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 12px;
-      font-size: 18px;
-      font-weight: bold;
-      background: white;
-      color: black;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: translate(3px, 3px);
+      box-shadow: none;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 24px;
+      margin-top: 10px;
+      box-shadow: 5px 5px 0 var(--border);
     }
 
     .secondary {
-      background: #242424;
-      color: white;
+      margin-top: 12px;
+      box-shadow: 5px 5px 0 var(--accent);
     }
 
     .beats {
-      font-size: 32px;
-      letter-spacing: 8px;
-      margin: 25px 0;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin: 18px 0;
     }
 
-    select {
-      width: 100%;
-      padding: 14px;
-      border-radius: 10px;
-      background: #1c1c1c;
-      color: white;
-      border: 1px solid #333;
-      font-size: 16px;
-      margin-top: 10px;
+    .beat {
+      height: 34px;
+      border: 3px solid var(--border);
+      background: var(--bg);
+    }
+
+    .beat.active {
+      background: var(--accent);
+    }
+
+    .accent-picker {
+      border-top: 3px solid var(--border);
+      margin-top: 20px;
+      padding-top: 14px;
+    }
+
+    .accent-title {
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .colors {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+
+    .color-btn {
+      height: 40px;
+      border: 3px solid var(--border);
+      padding: 0;
+    }
+
+    .color-btn.selected {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .white { background: #ffffff; }
+    .red { background: #ff2a2a; }
+    .green { background: #39ff14; }
+    .blue { background: #2f6bff; }
+    .yellow { background: #ffe600; }
+    .purple { background: #b000ff; }
+
+    .footer {
+      margin-top: 16px;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-align: center;
     }
   </style>
 </head>
+
 <body>
   <div class="app">
-    <h1>METRONOME</h1>
+    <div class="top-bar">
+      <h1>Metronome</h1>
+      <div class="status" id="status">STOPPED</div>
+    </div>
 
-    <div class="bpm" id="bpmDisplay">130</div>
-    <div class="label">BPM</div>
+    <div class="bpm-box">
+      <div class="bpm" id="bpmDisplay">130</div>
+      <div class="label">BPM</div>
+    </div>
 
     <input id="bpmSlider" type="range" min="40" max="240" value="130" />
 
-    <select id="timeSignature">
-      <option value="4">4/4</option>
-      <option value="3">3/4</option>
-      <option value="6">6/8</option>
-    </select>
+    <div class="control-row">
+      <select id="timeSignature">
+        <option value="4">4/4</option>
+        <option value="3">3/4</option>
+        <option value="6">6/8</option>
+      </select>
 
-    <div class="beats" id="beatDots">● ○ ○ ○</div>
+      <button id="minusFive">-5 BPM</button>
+    </div>
 
-    <button id="startStop">START</button>
+    <div class="control-row">
+      <button id="minusOne">-1</button>
+      <button id="plusOne">+1</button>
+    </div>
+
+    <div class="beats" id="beatDots"></div>
+
+    <button class="primary" id="startStop">START</button>
     <button class="secondary" id="tapTempo">TAP TEMPO</button>
+
+    <div class="accent-picker">
+      <div class="accent-title">Accent Color</div>
+      <div class="colors">
+        <button class="color-btn white selected" data-color="#ffffff"></button>
+        <button class="color-btn red" data-color="#ff2a2a"></button>
+        <button class="color-btn green" data-color="#39ff14"></button>
+        <button class="color-btn blue" data-color="#2f6bff"></button>
+        <button class="color-btn yellow" data-color="#ffe600"></button>
+        <button class="color-btn purple" data-color="#b000ff"></button>
+      </div>
+    </div>
+
+    <div class="footer">No ads. No account. No subscription.</div>
   </div>
 
   <script>
@@ -113,6 +267,12 @@
     const tapTempo = document.getElementById("tapTempo");
     const beatDots = document.getElementById("beatDots");
     const timeSignature = document.getElementById("timeSignature");
+    const statusText = document.getElementById("status");
+
+    const minusFive = document.getElementById("minusFive");
+    const minusOne = document.getElementById("minusOne");
+    const plusOne = document.getElementById("plusOne");
+    const colorButtons = document.querySelectorAll(".color-btn");
 
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -120,27 +280,34 @@
       const osc = audioContext.createOscillator();
       const gain = audioContext.createGain();
 
-      osc.frequency.value = accent ? 1200 : 800;
-      gain.gain.value = accent ? 0.8 : 0.45;
+      osc.frequency.value = accent ? 1400 : 850;
+      gain.gain.value = accent ? 0.9 : 0.5;
 
       osc.connect(gain);
       gain.connect(audioContext.destination);
 
       osc.start();
-      osc.stop(audioContext.currentTime + 0.05);
+      osc.stop(audioContext.currentTime + 0.045);
     }
 
-    function updateDots() {
-      let dots = "";
+    function renderBeats() {
+      beatDots.innerHTML = "";
+
       for (let i = 0; i < beatsPerBar; i++) {
-        dots += i === beat ? "● " : "○ ";
+        const dot = document.createElement("div");
+        dot.classList.add("beat");
+
+        if (i === beat) {
+          dot.classList.add("active");
+        }
+
+        beatDots.appendChild(dot);
       }
-      beatDots.textContent = dots.trim();
     }
 
     function tick() {
       playClick(beat === 0);
-      updateDots();
+      renderBeats();
       beat = (beat + 1) % beatsPerBar;
     }
 
@@ -151,12 +318,14 @@
       interval = setInterval(tick, 60000 / bpm);
       isPlaying = true;
       startStop.textContent = "STOP";
+      statusText.textContent = "PLAYING";
     }
 
     function stopMetronome() {
       clearInterval(interval);
       isPlaying = false;
       startStop.textContent = "START";
+      statusText.textContent = "STOPPED";
     }
 
     function restartIfPlaying() {
@@ -166,16 +335,21 @@
       }
     }
 
-    bpmSlider.addEventListener("input", () => {
-      bpm = Number(bpmSlider.value);
+    function setBpm(newBpm) {
+      bpm = Math.max(40, Math.min(240, newBpm));
       bpmDisplay.textContent = bpm;
+      bpmSlider.value = bpm;
       restartIfPlaying();
+    }
+
+    bpmSlider.addEventListener("input", () => {
+      setBpm(Number(bpmSlider.value));
     });
 
     timeSignature.addEventListener("change", () => {
       beatsPerBar = Number(timeSignature.value);
       beat = 0;
-      updateDots();
+      renderBeats();
       restartIfPlaying();
     });
 
@@ -191,26 +365,49 @@
       const now = Date.now();
       taps.push(now);
 
-      if (taps.length > 4) taps.shift();
+      if (taps.length > 5) {
+        taps.shift();
+      }
 
       if (taps.length >= 2) {
         const intervals = [];
+
         for (let i = 1; i < taps.length; i++) {
           intervals.push(taps[i] - taps[i - 1]);
         }
 
         const avg = intervals.reduce((a, b) => a + b, 0) / intervals.length;
-        bpm = Math.round(60000 / avg);
+        const tappedBpm = Math.round(60000 / avg);
 
-        if (bpm >= 40 && bpm <= 240) {
-          bpmDisplay.textContent = bpm;
-          bpmSlider.value = bpm;
-          restartIfPlaying();
+        if (tappedBpm >= 40 && tappedBpm <= 240) {
+          setBpm(tappedBpm);
         }
       }
     });
 
-    updateDots();
+    minusFive.addEventListener("click", () => {
+      setBpm(bpm - 5);
+    });
+
+    minusOne.addEventListener("click", () => {
+      setBpm(bpm - 1);
+    });
+
+    plusOne.addEventListener("click", () => {
+      setBpm(bpm + 1);
+    });
+
+    colorButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        const color = button.dataset.color;
+        document.documentElement.style.setProperty("--accent", color);
+
+        colorButtons.forEach(btn => btn.classList.remove("selected"));
+        button.classList.add("selected");
+      });
+    });
+
+    renderBeats();
   </script>
 </body>
 </html>
